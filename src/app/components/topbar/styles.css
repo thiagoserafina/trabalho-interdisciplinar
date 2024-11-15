@@ -1,0 +1,48 @@
+.topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 2rem;
+  background-color: #fff;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+
+  &__wrapper {
+    display: flex;
+    align-items: center;
+  }
+
+  &__logo {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #171717;
+  }
+
+  &__menu {
+    display: none;
+  }
+
+  &__menu-icon {
+    font-size: 1.5rem;
+    color: #171717;
+  }
+
+  &__menu-list {
+    display: flex;
+    gap: 1rem;
+  }
+
+  &__menu-item {
+    font-size: 1rem;
+    font-weight: 500;
+    color: #171717;
+    cursor: pointer;
+  }
+
+  &__menu-item:hover {
+    color: var(--highlight);
+  }
+
+  &__menu-item.active {
+    color: var(--highlight);
+  }
+}
