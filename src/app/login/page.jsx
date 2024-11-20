@@ -4,7 +4,7 @@ import { LucideEye, LucideEyeClosed } from "lucide-react";
 import Image from "next/image";
 import React from "react";
 
-const LoginPage = () => {
+export default function LoginPage() {
   const [login, setLogin] = React.useState("");
   const [password, setPassword] = React.useState("");
   const [showPassword, setShowPassword] = React.useState(false);
@@ -82,6 +82,4 @@ const LoginPage = () => {
       </div>
     </div>
   );
-};
-
-export default LoginPage;
+}

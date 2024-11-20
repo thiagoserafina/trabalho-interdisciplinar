@@ -1,19 +1,31 @@
 import React from "react";
-import "./styles.css";
+import Link from "next/link";
+import styles from "./Sidebar.module.css";
+import { LucideCalendar, LucideSettings, LucideUser } from "lucide-react";
+import Image from "next/image";
 
-const SidebarComponent = () => {
+export default function Sidebar() {
   return (
-    <div className="sidebar">
-      <div className="sidebar__wrapper">
-        <div className="sidebar__logo">Logo</div>
-        <div className="sidebar__menu">
-          <a href="/students">Students</a>
-          <a href="/calendar">Calendar</a>
-          <a href="/settings">Settings</a>
-        </div>
+    <div className={styles.sidebar}>
+      <div className={styles.logo}>
+        <Image
+          src={"/images/apae-logo.png"}
+          width={45}
+          height={45}
+          alt="APAE"
+        />
       </div>
+      <nav className={styles.nav}>
+        <Link href="/calendar" passHref>
+          <LucideCalendar />
+        </Link>
+        <Link href="/students" passHref>
+          <LucideUser />
+        </Link>
+        <Link href="/settings" passHref>
+          <LucideSettings />
+        </Link>
+      </nav>
     </div>
   );
-};
-
-export default SidebarComponent;
+}

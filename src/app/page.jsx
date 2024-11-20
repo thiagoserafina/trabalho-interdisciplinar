@@ -1,9 +1,3 @@
-import LoginPage from "./pages/login";
-
-export default function Home() {
-  return (
-    <div>
-      <LoginPage />
-    </div>
-  );
+export default function App() {
+  return <div>Home</div>;
 }
