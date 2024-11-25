@@ -1,5 +1,6 @@
 import React from "react";
+import Layout from "../components/layout";
 
 export default function CalendarPage() {
-  return <div>CalendarPage</div>;
+  return <Layout>CalendarPage</Layout>;
 }

@@ -1,7 +1,12 @@
 import React from "react";
 import Link from "next/link";
 import styles from "./Sidebar.module.css";
-import { LucideCalendar, LucideSettings, LucideUser } from "lucide-react";
+import {
+  BriefcaseMedical,
+  LucideCalendar,
+  LucideSettings,
+  LucideUser,
+} from "lucide-react";
 import Image from "next/image";
 
 export default function Sidebar() {
@@ -21,6 +26,9 @@ export default function Sidebar() {
         </Link>
         <Link href="/students" passHref>
           <LucideUser />
+        </Link>
+        <Link href="/professionals" passHref>
+          <BriefcaseMedical />
         </Link>
         <Link href="/settings" passHref>
           <LucideSettings />

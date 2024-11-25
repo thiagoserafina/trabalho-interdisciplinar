@@ -1,7 +1,5 @@
 import localFont from "next/font/local";
 import "./globals.css";
-import Sidebar from "./components/sidebar";
-import Layout from "./components/layout";
 
 const robotoRegular = localFont({
   src: "./fonts/Roboto-Regular.ttf",
@@ -30,7 +28,7 @@ export default function RootLayout({ children }) {
       <body
         className={`${robotoRegular.variable} ${robotoMedium.variable} ${robotoBold.variable} antialiased`}
       >
-        <Layout>{children}</Layout>
+        {children}
       </body>
     </html>
   );
