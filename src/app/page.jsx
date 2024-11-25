@@ -1,9 +1,7 @@
-import LoginPage from "./pages/login";
+"use client";
 
-export default function Home() {
-  return (
-    <div>
-      <LoginPage />
-    </div>
-  );
+function App() {
+  return <div>Carregando...</div>;
 }
+
+export default App;

@@ -24,7 +24,7 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="pt-br">
+    <html lang="pt-br" suppressHydrationWarning>
       <body
         className={`${robotoRegular.variable} ${robotoMedium.variable} ${robotoBold.variable} antialiased`}
       >
