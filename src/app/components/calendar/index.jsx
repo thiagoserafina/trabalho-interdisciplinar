@@ -53,6 +53,44 @@ export default function Calendar() {
   };
 
   const events = [
+    // 24/11
+    {
+      tipo_atendimento: "Fisioterapia",
+      alunoNome: "Carlos Oliveira",
+      funcionarioNome: "Ana Silva",
+      especialidade: "Fisioterapeuta",
+      sala: "Sala 01",
+      date: "2024-11-24",
+      startTime: "08:00",
+      endTime: "09:00",
+      status: "Concluído",
+      color: "yellow",
+    },
+    {
+      tipo_atendimento: "Fonoaudiologia",
+      alunoNome: "Julia Santos",
+      funcionarioNome: "Maria Souza",
+      especialidade: "Fonoaudióloga",
+      sala: "Sala 02",
+      date: "2024-11-24",
+      startTime: "10:00",
+      endTime: "10:30",
+      status: "Cancelado",
+      color: "gray",
+    },
+    // 25/11
+    {
+      tipo_atendimento: "Psicologia",
+      alunoNome: "Mariana Lima",
+      funcionarioNome: "Carla Mendes",
+      especialidade: "Psicóloga",
+      sala: "Sala 03",
+      date: "2024-11-25",
+      startTime: "11:00",
+      endTime: "12:00",
+      status: "Concluído",
+      color: "yellow",
+    },
     {
       tipo_atendimento: "Fisioterapia",
       alunoNome: "Joice Pereira",
@@ -60,10 +98,23 @@ export default function Calendar() {
       especialidade: "Fisioterapeuta",
       sala: "Sala 01",
       date: "2024-11-25",
-      startTime: "07:00",
+      startTime: "07:30",
       endTime: "08:00",
       status: "Atrasado",
       color: "red",
+    },
+    // 26/11
+    {
+      tipo_atendimento: "Nutrição",
+      alunoNome: "Lucas Almeida",
+      funcionarioNome: "Renata Borges",
+      especialidade: "Nutricionista",
+      sala: "Sala 04",
+      date: "2024-11-26",
+      startTime: "08:30",
+      endTime: "09:00",
+      status: "Concluído",
+      color: "yellow",
     },
     {
       tipo_atendimento: "Fonoaudiologia",
@@ -77,6 +128,32 @@ export default function Calendar() {
       status: "Concluído",
       color: "yellow",
     },
+    // 27/11
+    {
+      tipo_atendimento: "Psicologia",
+      alunoNome: "Beatriz Rocha",
+      funcionarioNome: "Carla Mendes",
+      especialidade: "Psicóloga",
+      sala: "Sala 03",
+      date: "2024-11-27",
+      startTime: "14:00",
+      endTime: "15:00",
+      status: "Em atendimento",
+      color: "green",
+    },
+    {
+      tipo_atendimento: "Fisioterapia",
+      alunoNome: "Pedro Nunes",
+      funcionarioNome: "Ana Silva",
+      especialidade: "Fisioterapeuta",
+      sala: "Sala 01",
+      date: "2024-11-27",
+      startTime: "16:00",
+      endTime: "17:00",
+      status: "Confirmado",
+      color: "blue",
+    },
+    // 28/11
     {
       tipo_atendimento: "Fisioterapia",
       alunoNome: "Bruno Costa",
@@ -90,16 +167,66 @@ export default function Calendar() {
       color: "green",
     },
     {
-      tipo_atendimento: "Fisioterapia",
+      tipo_atendimento: "Fonoaudiologia",
       alunoNome: "Bruno Costa",
+      funcionarioNome: "Maria Souza",
+      especialidade: "Fonoaudióloga",
+      sala: "Sala 01",
+      date: "2024-11-28",
+      startTime: "10:45",
+      endTime: "11:15",
+      status: "Em atendimento",
+      color: "green",
+    },
+    // 29/11
+    {
+      tipo_atendimento: "Nutrição",
+      alunoNome: "Fernanda Silva",
+      funcionarioNome: "Renata Borges",
+      especialidade: "Nutricionista",
+      sala: "Sala 04",
+      date: "2024-11-29",
+      startTime: "09:00",
+      endTime: "09:30",
+      status: "Confirmado",
+      color: "blue",
+    },
+    {
+      tipo_atendimento: "Psicologia",
+      alunoNome: "Carlos Oliveira",
+      funcionarioNome: "Carla Mendes",
+      especialidade: "Psicóloga",
+      sala: "Sala 03",
+      date: "2024-11-29",
+      startTime: "15:00",
+      endTime: "16:00",
+      status: "Cancelado",
+      color: "gray",
+    },
+    // 30/11
+    {
+      tipo_atendimento: "Fisioterapia",
+      alunoNome: "Joice Pereira",
       funcionarioNome: "Ana Silva",
       especialidade: "Fisioterapeuta",
       sala: "Sala 01",
-      date: "2024-11-28",
-      startTime: "10:30",
-      endTime: "11:00",
-      status: "Em atendimento",
-      color: "green",
+      date: "2024-11-30",
+      startTime: "08:00",
+      endTime: "09:00",
+      status: "Concluído",
+      color: "yellow",
+    },
+    {
+      tipo_atendimento: "Fonoaudiologia",
+      alunoNome: "Lucas Almeida",
+      funcionarioNome: "Maria Souza",
+      especialidade: "Fonoaudióloga",
+      sala: "Sala 02",
+      date: "2024-11-30",
+      startTime: "10:00",
+      endTime: "10:30",
+      status: "Confirmado",
+      color: "blue",
     },
   ];
 
@@ -164,67 +291,81 @@ export default function Calendar() {
               {weekDays.map((day, dayIndex) => (
                 <div key={`${index}-${dayIndex}`} className={styles.gridCell}>
                   {events
-                    .filter(
-                      (event) => event.date === day.toISOString().split("T")[0]
-                    )
+                    .filter((event) => {
+                      const eventDateISO = new Date(event.date)
+                        .toISOString()
+                        .split("T")[0]; // Formata a data do evento
+                      const dayISO = day.toISOString().split("T")[0]; // Formata o dia atual
+
+                      const eventStart =
+                        parseInt(event.startTime.split(":")[0], 10) * 60 +
+                        parseInt(event.startTime.split(":")[1], 10);
+                      const eventEnd =
+                        parseInt(event.endTime.split(":")[0], 10) * 60 +
+                        parseInt(event.endTime.split(":")[1], 10);
+                      const currentHour = parseInt(hour.split(":")[0], 10) * 60;
+
+                      return (
+                        eventDateISO === dayISO && // Confirma que o evento é do mesmo dia
+                        eventStart < currentHour + 60 && // Começa antes do fim desta linha
+                        eventEnd > currentHour // Termina depois do início desta linha
+                      );
+                    })
                     .map((event, eventIndex) => {
-                      const [startHour, startMinutes] = event.startTime
-                        .split(":")
-                        .map(Number);
-                      const [endHour, endMinutes] = event.endTime
-                        .split(":")
-                        .map(Number);
-                      const [cellHour, cellMinutes] = hour
-                        .split(":")
-                        .map(Number);
+                      const startHour = parseInt(
+                        event.startTime.split(":")[0],
+                        10
+                      );
+                      const startMinutes = parseInt(
+                        event.startTime.split(":")[1],
+                        10
+                      );
+                      const endHour = parseInt(event.endTime.split(":")[0], 10);
+                      const endMinutes = parseInt(
+                        event.endTime.split(":")[1],
+                        10
+                      );
 
-                      // Cálculo da posição inicial (top) e altura (height) do evento
-                      const eventStartInMinutes = startHour * 60 + startMinutes;
-                      const eventEndInMinutes = endHour * 60 + endMinutes;
-                      const cellStartInMinutes = cellHour * 60 + cellMinutes;
-                      const cellEndInMinutes = cellStartInMinutes + 60;
+                      const currentStartHour = parseInt(hour.split(":")[0], 10);
+                      const currentStartMinutes = parseInt(
+                        hour.split(":")[1],
+                        10
+                      );
 
-                      // Verifica se o evento aparece nesta célula (interseção de horários)
-                      if (
-                        eventStartInMinutes < cellEndInMinutes &&
-                        eventEndInMinutes > cellStartInMinutes
-                      ) {
-                        const top =
-                          ((Math.max(eventStartInMinutes, cellStartInMinutes) -
-                            cellStartInMinutes) /
-                            60) *
-                          100;
-                        const height =
-                          ((Math.min(eventEndInMinutes, cellEndInMinutes) -
-                            Math.max(eventStartInMinutes, cellStartInMinutes)) /
-                            60) *
-                          100;
+                      const startOffset =
+                        (startHour * 60 +
+                          startMinutes -
+                          (currentStartHour * 60 + currentStartMinutes)) /
+                        60;
 
-                        return (
+                      const duration =
+                        (endHour * 60 +
+                          endMinutes -
+                          (startHour * 60 + startMinutes)) /
+                        60;
+
+                      return (
+                        <div
+                          key={eventIndex}
+                          className={`${styles.event} ${styles[event.color]}`}
+                          style={{
+                            top: `${startOffset * 100}%`,
+                            height: `${duration * 100}%`,
+                          }}
+                          onClick={() => handleEventClick(event)}
+                        >
                           <div
-                            key={eventIndex}
-                            className={`${styles.event} ${styles[event.color]}`}
                             style={{
-                              top: `${top}%`,
-                              height: `${height}%`,
-                              position: "absolute",
+                              display: "flex",
+                              justifyContent: "space-between",
                             }}
-                            onClick={() => handleEventClick(event)}
                           >
-                            <div
-                              style={{
-                                display: "flex",
-                                justifyContent: "space-between",
-                              }}
-                            >
-                              <strong>{event.alunoNome}</strong>
-                              {event.sala} <br />
-                            </div>
-                            {event.funcionarioNome} ({event.especialidade})
+                            <strong>{event.alunoNome}</strong>
+                            {event.sala} <br />
                           </div>
-                        );
-                      }
-                      return null;
+                          {event.funcionarioNome} ({event.especialidade})
+                        </div>
+                      );
                     })}
                 </div>
               ))}

@@ -136,6 +136,10 @@
   color: #ffffff;
 }
 
+.event.gray {
+  background-color: #9e9e9e;
+}
+
 @media (max-width: 768px) {
   .calendarGrid {
     grid-template-columns: 80px repeat(7, 1fr);
