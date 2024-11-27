@@ -1,11 +1,13 @@
 /* Contêiner principal */
 .calendarContainer {
   width: 90%;
+  max-height: 80vh;
   padding: 1.5rem;
   background-color: #f9f9f9;
   border-radius: 10px;
   box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
   font-family: Arial, sans-serif;
+  overflow: hidden;
 }
 
 /* Cabeçalho de navegação da semana */
@@ -18,7 +20,7 @@
 }
 
 .calendarHeader h2 {
-  font-size: 16px; /* Fonte menor */
+  font-size: 16px;
   color: #333;
   font-weight: bold;
   margin: 0;
@@ -29,7 +31,7 @@
   border: none;
   padding: 2px;
   cursor: pointer;
-  font-size: 22px; /* Ajuste de tamanho das setas */
+  font-size: 22px;
   color: var(--highlight-dark);
   transition: color 0.2s ease;
 }
@@ -53,7 +55,8 @@
   gap: 1px;
   background-color: #ddd;
   border-radius: 8px;
-  overflow: hidden;
+  overflow: scroll;
+  max-height: 70vh;
 }
 
 .gridHeader {
@@ -63,6 +66,10 @@
   font-weight: bold;
   font-size: 14px;
   color: #666;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  border-bottom: 1px solid #ddd;
 }
 
 .gridCell {
@@ -82,6 +89,20 @@
   font-weight: bold;
   padding: 1rem 0;
   color: #666;
+}
+
+.timeColumnHeader {
+  text-align: center;
+  background-color: #f4f4f4;
+  font-size: 14px;
+  font-weight: bold;
+  padding: 1rem;
+  color: #333;
+  position: sticky;
+  top: 0;
+  left: 0;
+  z-index: 10;
+  border-bottom: 1px solid #ddd;
 }
 
 /* Eventos */
@@ -157,24 +178,25 @@
 
 /* Botões de filtro */
 .filterButton {
-  background-color: #fff;
-  border: 1px solid #ccc;
+  background-color: var(--background);
+  border: 1px solid var(--gray-dark);
   color: #333;
   font-size: 14px;
   padding: 8px 12px;
   border-radius: 6px;
   cursor: pointer;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
   transition: all 0.2s ease;
 }
 
 .filterButton:hover {
-  background-color: #ffc107;
+  background-color: var(--secondary);
   color: #000;
 }
 
 /* Botão de adicionar novo agendamento */
 .addButton {
-  background-color: #ffc107;
+  background-color: var(--highlight);
   color: #000;
   font-weight: bold;
   font-size: 14px;
@@ -187,5 +209,5 @@
 }
 
 .addButton:hover {
-  background-color: #ff9800;
+  background-color: var(--highlight-dark);
 }

@@ -62,6 +62,15 @@ export default function Calendario() {
       student: "Joice Pereira",
       color: "green",
     },
+    {
+      date: "2024-11-26",
+      startTime: "07:30",
+      endTime: "08:30",
+      title: "Fisio 03",
+      status: "Em Atendimento",
+      student: "Joice Pereira",
+      color: "green",
+    },
   ];
 
   const hours = [
@@ -70,11 +79,16 @@ export default function Calendario() {
     "08:00",
     "08:30",
     "09:00",
-    "09:30",
     "10:00",
-    "10:30",
     "11:00",
-    "11:30",
+    "12:00",
+    "13:00",
+    "14:00",
+    "15:00",
+    "16:00",
+    "17:00",
+    "18:00",
+    "19:00",
   ];
 
   const getEventsForDayAndTime = (day, time) => {
@@ -89,10 +103,10 @@ export default function Calendario() {
     <React.Fragment>
       <div className={styles.calendarToolbar}>
         <div className={styles.filters}>
-          <button className={styles.filterButton}>Semana</button>
           <button className={styles.filterButton} onClick={handleToday}>
             Hoje
           </button>
+          <button className={styles.filterButton}>Semana</button>
         </div>
 
         <button className={styles.addButton}>+ Novo agendamento</button>
@@ -113,7 +127,7 @@ export default function Calendario() {
         <div className={styles.calendarHeaderLine}></div>
 
         <div className={styles.calendarGrid}>
-          <div className={styles.timeColumn}>Horário</div>
+          <div className={styles.timeColumnHeader}>Horário</div>
           {weekDays.map((day, index) => (
             <div key={index} className={styles.gridHeader}>
               {day.toLocaleDateString("pt-BR", {
