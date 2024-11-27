@@ -75,7 +75,7 @@
 .gridCell {
   background-color: #ffffff;
   position: relative;
-  padding: 2.1rem;
+  padding: 3rem;
 }
 
 /* Coluna de horários */
@@ -109,14 +109,14 @@
 .event {
   position: absolute;
   top: 10%;
-  left: 5%;
-  width: 90%;
+  left: 0%;
+  width: 100%;
   padding: 8px;
-  border-radius: 6px;
   font-size: 12px;
   color: white;
   line-height: 1.2;
   box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
 }
 
 .event.red {
@@ -210,4 +210,37 @@
 
 .addButton:hover {
   background-color: var(--highlight-dark);
+}
+
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal {
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+  width: 400px;
+  max-width: 90%;
+}
+
+.closeButton {
+  background: #f44336;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+  margin-top: 10px;
 }

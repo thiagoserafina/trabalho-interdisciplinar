@@ -4,8 +4,20 @@ import React, { useState } from "react";
 import styles from "./Calendario.module.css";
 import { LucideChevronLeft, LucideChevronRight } from "lucide-react";
 
-export default function Calendario() {
+export default function Calendar() {
   const [currentWeek, setCurrentWeek] = useState(new Date());
+  const [selectedEvent, setSelectedEvent] = useState(null);
+  const [isModalVisible, setModalVisible] = useState(false);
+
+  const handleEventClick = (event) => {
+    setSelectedEvent(event);
+    setModalVisible(true);
+  };
+
+  const handleCloseModal = () => {
+    setSelectedEvent(null);
+    setModalVisible(false);
+  };
 
   const generateWeek = (date) => {
     const startOfWeek = new Date(date.setDate(date.getDate() - date.getDay()));
@@ -31,53 +43,51 @@ export default function Calendario() {
   };
 
   const handleToday = () => {
-    setCurrentWeek(new Date()); // Redefine para a semana do dia atual
+    setCurrentWeek(new Date());
   };
 
   const events = [
     {
-      date: "2024-10-14",
+      tipo_atendimento: "Fisioterapia",
+      alunoNome: "Joice Pereira",
+      funcionarioNome: "Ana Silva",
+      especialidade: "Fisioterapeuta",
+      sala: "Sala 01",
+      date: "2024-11-25",
       startTime: "07:00",
-      endTime: "07:30",
-      title: "Pedagogo 03",
+      endTime: "08:00",
       status: "Atrasado",
-      student: "Joice Pereira",
       color: "red",
     },
     {
-      date: "2024-10-15",
-      startTime: "08:00",
-      endTime: "08:30",
-      title: "Fono 02",
+      tipo_atendimento: "Fonoaudiologia",
+      alunoNome: "Ruan Silva",
+      funcionarioNome: "Maria Souza",
+      especialidade: "Fonoaudióloga",
+      sala: "Sala 02",
+      date: "2024-11-26",
+      startTime: "09:00",
+      endTime: "09:30",
       status: "Concluído",
-      student: "Ruan Silva",
       color: "yellow",
     },
     {
-      date: "2024-10-17",
-      startTime: "07:30",
-      endTime: "08:00",
-      title: "Fisio 03",
-      status: "Em Atendimento",
-      student: "Joice Pereira",
-      color: "green",
-    },
-    {
-      date: "2024-11-26",
-      startTime: "07:30",
-      endTime: "08:30",
-      title: "Fisio 03",
-      status: "Em Atendimento",
-      student: "Joice Pereira",
+      tipo_atendimento: "Fisioterapia",
+      alunoNome: "Bruno Costa",
+      funcionarioNome: "Ana Silva",
+      especialidade: "Fisioterapeuta",
+      sala: "Sala 01",
+      date: "2024-11-28",
+      startTime: "10:00",
+      endTime: "10:30",
+      status: "Em atendimento",
       color: "green",
     },
   ];
 
   const hours = [
     "07:00",
-    "07:30",
     "08:00",
-    "08:30",
     "09:00",
     "10:00",
     "11:00",
@@ -142,24 +152,95 @@ export default function Calendario() {
               <div className={styles.timeColumn}>{hour}</div>
               {weekDays.map((day, dayIndex) => (
                 <div key={`${index}-${dayIndex}`} className={styles.gridCell}>
-                  {getEventsForDayAndTime(day, hour).map(
-                    (event, eventIndex) => (
-                      <div
-                        key={eventIndex}
-                        className={`${styles.event} ${styles[event.color]}`}
-                      >
-                        <strong>{event.title}</strong> <br />
-                        {event.status} <br />
-                        {event.student}
-                      </div>
+                  {events
+                    .filter(
+                      (event) =>
+                        event.date === day.toISOString().split("T")[0] &&
+                        event.startTime <= hour &&
+                        event.endTime > hour
                     )
-                  )}
+                    .map((event, eventIndex) => {
+                      const startHour = parseInt(
+                        event.startTime.split(":")[0],
+                        10
+                      );
+                      const startMinutes = parseInt(
+                        event.startTime.split(":")[1],
+                        10
+                      );
+                      const endHour = parseInt(event.endTime.split(":")[0], 10);
+                      const endMinutes = parseInt(
+                        event.endTime.split(":")[1],
+                        10
+                      );
+
+                      const startOffset =
+                        (startHour * 60 +
+                          startMinutes -
+                          parseInt(hour.split(":")[0], 10) * 60) /
+                        60;
+                      const duration =
+                        (endHour * 60 +
+                          endMinutes -
+                          (startHour * 60 + startMinutes)) /
+                        60;
+
+                      return (
+                        <div
+                          key={eventIndex}
+                          className={`${styles.event} ${styles[event.color]}`}
+                          style={{
+                            top: `${startOffset * 100}%`,
+                            height: `${duration * 100}%`,
+                          }}
+                          onClick={() => handleEventClick(event)}
+                        >
+                          <div
+                            style={{
+                              display: "flex",
+                              justifyContent: "space-between",
+                            }}
+                          >
+                            <strong>{event.alunoNome}</strong>
+                            {event.sala} <br />
+                          </div>
+                          {event.funcionarioNome} ({event.especialidade})
+                        </div>
+                      );
+                    })}
                 </div>
               ))}
             </React.Fragment>
           ))}
         </div>
       </div>
+      {isModalVisible && selectedEvent && (
+        <div className={styles.modalOverlay} onClick={handleCloseModal}>
+          <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
+            <h2>{selectedEvent.tipo_atendimento}</h2>
+            <p>
+              <strong>Aluno:</strong> {selectedEvent.alunoNome}
+            </p>
+            <p>
+              <strong>Profissional:</strong> {selectedEvent.funcionarioNome} (
+              {selectedEvent.especialidade})
+            </p>
+            <p>
+              <strong>Sala:</strong> {selectedEvent.sala}
+            </p>
+            <p>
+              <strong>Status:</strong> {selectedEvent.status}
+            </p>
+            <p>
+              <strong>Horário:</strong> {selectedEvent.startTime} -{" "}
+              {selectedEvent.endTime}
+            </p>
+            <button onClick={handleCloseModal} className={styles.closeButton}>
+              Fechar
+            </button>
+          </div>
+        </div>
+      )}
     </React.Fragment>
   );
 }
