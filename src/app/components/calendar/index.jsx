@@ -2,11 +2,7 @@
 
 import React, { useState } from "react";
 import styles from "./Calendario.module.css";
-import {
-  LucideChevronLeft,
-  LucideChevronRight,
-  LucideCircleArrowLeft,
-} from "lucide-react";
+import { LucideChevronLeft, LucideChevronRight } from "lucide-react";
 
 export default function Calendario() {
   const [currentWeek, setCurrentWeek] = useState(new Date());
@@ -32,6 +28,10 @@ export default function Calendario() {
   const handleNextWeek = () => {
     const nextWeek = new Date(currentWeek.setDate(currentWeek.getDate() + 7));
     setCurrentWeek(nextWeek);
+  };
+
+  const handleToday = () => {
+    setCurrentWeek(new Date()); // Redefine para a semana do dia atual
   };
 
   const events = [
@@ -86,52 +86,66 @@ export default function Calendario() {
   };
 
   return (
-    <div className={styles.calendarContainer}>
-      <div className={styles.calendarHeader}>
-        <button onClick={handlePrevWeek}>
-          <LucideChevronLeft />
-        </button>
-        <h2>
-          Semana: {weekDays[0].toLocaleDateString()} -{" "}
-          {weekDays[6].toLocaleDateString()}
-        </h2>
-        <button onClick={handleNextWeek}>
-          <LucideChevronRight />
-        </button>
-      </div>
-      <div className={styles.calendarHeaderLine}></div>
+    <React.Fragment>
+      <div className={styles.calendarToolbar}>
+        <div className={styles.filters}>
+          <button className={styles.filterButton}>Semana</button>
+          <button className={styles.filterButton} onClick={handleToday}>
+            Hoje
+          </button>
+        </div>
 
-      <div className={styles.calendarGrid}>
-        <div className={styles.timeColumn}>Horário</div>
-        {weekDays.map((day, index) => (
-          <div key={index} className={styles.gridHeader}>
-            {day.toLocaleDateString("pt-BR", {
-              weekday: "long",
-              day: "numeric",
-              month: "numeric",
-            })}
-          </div>
-        ))}
-        {hours.map((hour, index) => (
-          <React.Fragment key={index}>
-            <div className={styles.timeColumn}>{hour}</div>
-            {weekDays.map((day, dayIndex) => (
-              <div key={`${index}-${dayIndex}`} className={styles.gridCell}>
-                {getEventsForDayAndTime(day, hour).map((event, eventIndex) => (
-                  <div
-                    key={eventIndex}
-                    className={`${styles.event} ${styles[event.color]}`}
-                  >
-                    <strong>{event.title}</strong> <br />
-                    {event.status} <br />
-                    {event.student}
-                  </div>
-                ))}
-              </div>
-            ))}
-          </React.Fragment>
-        ))}
+        <button className={styles.addButton}>+ Novo agendamento</button>
       </div>
-    </div>
+      <div className={styles.calendarContainer}>
+        <div className={styles.calendarHeader}>
+          <button onClick={handlePrevWeek}>
+            <LucideChevronLeft />
+          </button>
+          <h2>
+            Semana: {weekDays[0].toLocaleDateString()} -{" "}
+            {weekDays[6].toLocaleDateString()}
+          </h2>
+          <button onClick={handleNextWeek}>
+            <LucideChevronRight />
+          </button>
+        </div>
+        <div className={styles.calendarHeaderLine}></div>
+
+        <div className={styles.calendarGrid}>
+          <div className={styles.timeColumn}>Horário</div>
+          {weekDays.map((day, index) => (
+            <div key={index} className={styles.gridHeader}>
+              {day.toLocaleDateString("pt-BR", {
+                weekday: "long",
+                day: "numeric",
+                month: "numeric",
+              })}
+            </div>
+          ))}
+          {hours.map((hour, index) => (
+            <React.Fragment key={index}>
+              <div className={styles.timeColumn}>{hour}</div>
+              {weekDays.map((day, dayIndex) => (
+                <div key={`${index}-${dayIndex}`} className={styles.gridCell}>
+                  {getEventsForDayAndTime(day, hour).map(
+                    (event, eventIndex) => (
+                      <div
+                        key={eventIndex}
+                        className={`${styles.event} ${styles[event.color]}`}
+                      >
+                        <strong>{event.title}</strong> <br />
+                        {event.status} <br />
+                        {event.student}
+                      </div>
+                    )
+                  )}
+                </div>
+              ))}
+            </React.Fragment>
+          ))}
+        </div>
+      </div>
+    </React.Fragment>
   );
 }
