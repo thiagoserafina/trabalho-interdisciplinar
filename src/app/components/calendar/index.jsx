@@ -19,8 +19,12 @@ export default function Calendar() {
     setModalVisible(false);
   };
 
+  // Gera os dias da semana com base na data fornecida
   const generateWeek = (date) => {
-    const startOfWeek = new Date(date.setDate(date.getDate() - date.getDay()));
+    const startOfWeek = new Date(date);
+    const dayOfWeek = startOfWeek.getDay(); // Dia da semana (0 = Domingo)
+    startOfWeek.setDate(startOfWeek.getDate() - dayOfWeek); // Ajusta para o início da semana
+    startOfWeek.setHours(0, 0, 0, 0); // Remove a hora para evitar discrepâncias
     const week = [];
     for (let i = 0; i < 7; i++) {
       const day = new Date(startOfWeek);
@@ -33,12 +37,14 @@ export default function Calendar() {
   const weekDays = generateWeek(new Date(currentWeek));
 
   const handlePrevWeek = () => {
-    const prevWeek = new Date(currentWeek.setDate(currentWeek.getDate() - 7));
+    const prevWeek = new Date(currentWeek);
+    prevWeek.setDate(currentWeek.getDate() - 7);
     setCurrentWeek(prevWeek);
   };
 
   const handleNextWeek = () => {
-    const nextWeek = new Date(currentWeek.setDate(currentWeek.getDate() + 7));
+    const nextWeek = new Date(currentWeek);
+    nextWeek.setDate(currentWeek.getDate() + 7);
     setCurrentWeek(nextWeek);
   };
 
@@ -85,6 +91,7 @@ export default function Calendar() {
     },
   ];
 
+  // Horários do calendário
   const hours = [
     "07:00",
     "08:00",
@@ -100,14 +107,6 @@ export default function Calendar() {
     "18:00",
     "19:00",
   ];
-
-  const getEventsForDayAndTime = (day, time) => {
-    return events.filter(
-      (event) =>
-        event.date === day.toISOString().split("T")[0] &&
-        event.startTime === time
-    );
-  };
 
   return (
     <React.Fragment>
