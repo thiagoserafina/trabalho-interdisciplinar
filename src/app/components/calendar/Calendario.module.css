@@ -116,6 +116,9 @@
   line-height: 1.2;
   border: 1px dashed var(--gray-dark);
   cursor: pointer;
+  text-wrap: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
 }
 
 .event.red {
@@ -221,7 +224,7 @@
   left: 0;
   width: 100vw;
   height: 100vh;
-  background: rgba(0, 0, 0, 0.5);
+  background: rgba(0, 0, 0, 0.25);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -229,10 +232,12 @@
 }
 
 .modal {
+  display: flex;
+  flex-direction: column;
   background: white;
   padding: 20px;
   border-radius: 10px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
   width: 400px;
   max-width: 90%;
 }
@@ -241,9 +246,10 @@
   background: #f44336;
   color: white;
   border: none;
-  padding: 10px 20px;
+  padding: 5px 15px;
   border-radius: 5px;
   cursor: pointer;
   font-size: 16px;
   margin-top: 10px;
+  align-self: flex-end;
 }
