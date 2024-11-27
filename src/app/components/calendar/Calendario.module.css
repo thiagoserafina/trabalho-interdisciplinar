@@ -108,14 +108,13 @@
 /* Eventos */
 .event {
   position: absolute;
-  top: 10%;
   left: 0%;
   width: 100%;
   padding: 8px;
   font-size: 12px;
   color: white;
   line-height: 1.2;
-  box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+  border: 1px dashed var(--gray-dark);
   cursor: pointer;
 }
 

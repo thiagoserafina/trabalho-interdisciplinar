@@ -89,6 +89,18 @@ export default function Calendar() {
       status: "Em atendimento",
       color: "green",
     },
+    {
+      tipo_atendimento: "Fisioterapia",
+      alunoNome: "Bruno Costa",
+      funcionarioNome: "Ana Silva",
+      especialidade: "Fisioterapeuta",
+      sala: "Sala 01",
+      date: "2024-11-28",
+      startTime: "10:30",
+      endTime: "11:00",
+      status: "Em atendimento",
+      color: "green",
+    },
   ];
 
   // Horários do calendário
@@ -153,59 +165,66 @@ export default function Calendar() {
                 <div key={`${index}-${dayIndex}`} className={styles.gridCell}>
                   {events
                     .filter(
-                      (event) =>
-                        event.date === day.toISOString().split("T")[0] &&
-                        event.startTime <= hour &&
-                        event.endTime > hour
+                      (event) => event.date === day.toISOString().split("T")[0]
                     )
                     .map((event, eventIndex) => {
-                      const startHour = parseInt(
-                        event.startTime.split(":")[0],
-                        10
-                      );
-                      const startMinutes = parseInt(
-                        event.startTime.split(":")[1],
-                        10
-                      );
-                      const endHour = parseInt(event.endTime.split(":")[0], 10);
-                      const endMinutes = parseInt(
-                        event.endTime.split(":")[1],
-                        10
-                      );
+                      const [startHour, startMinutes] = event.startTime
+                        .split(":")
+                        .map(Number);
+                      const [endHour, endMinutes] = event.endTime
+                        .split(":")
+                        .map(Number);
+                      const [cellHour, cellMinutes] = hour
+                        .split(":")
+                        .map(Number);
 
-                      const startOffset =
-                        (startHour * 60 +
-                          startMinutes -
-                          parseInt(hour.split(":")[0], 10) * 60) /
-                        60;
-                      const duration =
-                        (endHour * 60 +
-                          endMinutes -
-                          (startHour * 60 + startMinutes)) /
-                        60;
+                      // Cálculo da posição inicial (top) e altura (height) do evento
+                      const eventStartInMinutes = startHour * 60 + startMinutes;
+                      const eventEndInMinutes = endHour * 60 + endMinutes;
+                      const cellStartInMinutes = cellHour * 60 + cellMinutes;
+                      const cellEndInMinutes = cellStartInMinutes + 60;
 
-                      return (
-                        <div
-                          key={eventIndex}
-                          className={`${styles.event} ${styles[event.color]}`}
-                          style={{
-                            top: `${startOffset * 100}%`,
-                            height: `${duration * 100}%`,
-                          }}
-                          onClick={() => handleEventClick(event)}
-                        >
+                      // Verifica se o evento aparece nesta célula (interseção de horários)
+                      if (
+                        eventStartInMinutes < cellEndInMinutes &&
+                        eventEndInMinutes > cellStartInMinutes
+                      ) {
+                        const top =
+                          ((Math.max(eventStartInMinutes, cellStartInMinutes) -
+                            cellStartInMinutes) /
+                            60) *
+                          100;
+                        const height =
+                          ((Math.min(eventEndInMinutes, cellEndInMinutes) -
+                            Math.max(eventStartInMinutes, cellStartInMinutes)) /
+                            60) *
+                          100;
+
+                        return (
                           <div
+                            key={eventIndex}
+                            className={`${styles.event} ${styles[event.color]}`}
                             style={{
-                              display: "flex",
-                              justifyContent: "space-between",
+                              top: `${top}%`,
+                              height: `${height}%`,
+                              position: "absolute",
                             }}
+                            onClick={() => handleEventClick(event)}
                           >
-                            <strong>{event.alunoNome}</strong>
-                            {event.sala} <br />
+                            <div
+                              style={{
+                                display: "flex",
+                                justifyContent: "space-between",
+                              }}
+                            >
+                              <strong>{event.alunoNome}</strong>
+                              {event.sala} <br />
+                            </div>
+                            {event.funcionarioNome} ({event.especialidade})
                           </div>
-                          {event.funcionarioNome} ({event.especialidade})
-                        </div>
-                      );
+                        );
+                      }
+                      return null;
                     })}
                 </div>
               ))}
