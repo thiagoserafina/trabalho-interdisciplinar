@@ -1,0 +1,141 @@
+/* Contêiner principal */
+.calendarContainer {
+  width: 90%;
+  padding: 1.5rem;
+  background-color: #f9f9f9;
+  border-radius: 10px;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+  font-family: Arial, sans-serif;
+}
+
+/* Cabeçalho de navegação da semana */
+.calendarHeader {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 1rem;
+  gap: 10px;
+}
+
+.calendarHeader h2 {
+  font-size: 16px; /* Fonte menor */
+  color: #333;
+  font-weight: bold;
+  margin: 0;
+}
+
+.calendarHeader button {
+  background-color: transparent;
+  border: none;
+  padding: 2px;
+  cursor: pointer;
+  font-size: 22px; /* Ajuste de tamanho das setas */
+  color: var(--highlight-dark);
+  transition: color 0.2s ease;
+}
+
+.calendarHeader button:hover {
+  color: #000;
+}
+
+/* Linha para manter alinhamento visual */
+.calendarHeaderLine {
+  height: 1px;
+  background-color: #ddd;
+  width: 100%;
+  margin-top: 10px;
+}
+
+/* Grade do calendário */
+.calendarGrid {
+  display: grid;
+  grid-template-columns: 10% repeat(7, 12.79%);
+  gap: 1px;
+  background-color: #ddd;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.gridHeader {
+  text-align: center;
+  background-color: #ffffff;
+  padding: 1rem;
+  font-weight: bold;
+  font-size: 14px;
+  color: #666;
+}
+
+.gridCell {
+  background-color: #ffffff;
+  position: relative;
+  padding: 2.1rem;
+}
+
+/* Coluna de horários */
+.timeColumn {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #f4f4f4;
+  text-align: center;
+  font-size: 12px;
+  font-weight: bold;
+  padding: 1rem 0;
+  color: #666;
+}
+
+/* Eventos */
+.event {
+  position: absolute;
+  top: 10%;
+  left: 5%;
+  width: 90%;
+  padding: 8px;
+  border-radius: 6px;
+  font-size: 12px;
+  color: white;
+  line-height: 1.2;
+  box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.event.red {
+  background-color: #ff4d4f;
+}
+
+.event.yellow {
+  background-color: #ffeb3b;
+  color: #000;
+}
+
+.event.green {
+  background-color: #4caf50;
+}
+
+.event.blue {
+  background-color: #2196f3;
+  color: #ffffff;
+}
+
+@media (max-width: 768px) {
+  .calendarGrid {
+    grid-template-columns: 80px repeat(7, 1fr);
+  }
+
+  .timeColumn {
+    font-size: 10px;
+  }
+
+  .gridHeader {
+    font-size: 12px;
+    padding: 0.8rem;
+  }
+
+  .event {
+    font-size: 10px;
+    padding: 6px;
+  }
+
+  .calendarHeader h2 {
+    font-size: 18px;
+  }
+}
