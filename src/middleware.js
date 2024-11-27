@@ -8,6 +8,7 @@ export async function middleware(request) {
   const token = cookie.get(TOKEN_KEY);
 
   const protectedRoutes = [
+    "/",
     "/calendar",
     "/professionals",
     "/students",
