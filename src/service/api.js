@@ -3,6 +3,7 @@
 import { cookies } from "next/headers";
 import axios from "axios";
 import { TOKEN_KEY } from "@/middleware";
+import { jwtDecode } from "jwt-decode";
 
 const BASE_URL = "http://localhost:3030";
 
@@ -33,4 +34,28 @@ export async function login(data) {
 export async function logout() {
   const cookiesData = await cookies();
   cookiesData.delete(TOKEN_KEY);
+}
+
+export async function changePassword(data) {
+  const cookiesData = await cookies();
+  const token = cookiesData.get(TOKEN_KEY).value;
+
+  if (!token) {
+    throw new Error("Token não encontrado.");
+  }
+
+  const decodedToken = jwtDecode(token);
+  const { usuario } = decodedToken;
+
+  data.usuario = usuario;
+
+  console.log(data);
+
+  try {
+    const response = await axiosInstance.put("/api/login/alterarsenha", data);
+    return response.data;
+  } catch (error) {
+    console.error("Erro ao alterar senha:", error);
+    throw new Error("Erro ao alterar senha.");
+  }
 }
