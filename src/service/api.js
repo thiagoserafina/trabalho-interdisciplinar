@@ -34,3 +34,7 @@ export async function logout() {
   const cookiesData = await cookies();
   cookiesData.delete(TOKEN_KEY);
 }
+
+export async function addProfessional(data) {
+  const response = await axiosInstance.post("/api/", data)
+}
