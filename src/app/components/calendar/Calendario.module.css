@@ -1,0 +1,255 @@
+/* Contêiner principal */
+.calendarContainer {
+  width: 90%;
+  max-height: 80vh;
+  padding: 1.5rem;
+  background-color: #f9f9f9;
+  border-radius: 10px;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+  font-family: Arial, sans-serif;
+  overflow: hidden;
+}
+
+/* Cabeçalho de navegação da semana */
+.calendarHeader {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 1rem;
+  gap: 10px;
+}
+
+.calendarHeader h2 {
+  font-size: 16px;
+  color: #333;
+  font-weight: bold;
+  margin: 0;
+}
+
+.calendarHeader button {
+  background-color: transparent;
+  border: none;
+  padding: 2px;
+  cursor: pointer;
+  font-size: 22px;
+  color: var(--highlight-dark);
+  transition: color 0.2s ease;
+}
+
+.calendarHeader button:hover {
+  color: #000;
+}
+
+/* Linha para manter alinhamento visual */
+.calendarHeaderLine {
+  height: 1px;
+  background-color: #ddd;
+  width: 100%;
+  margin-top: 10px;
+}
+
+/* Grade do calendário */
+.calendarGrid {
+  display: grid;
+  grid-template-columns: 10% repeat(7, 12.79%);
+  gap: 1px;
+  background-color: #ddd;
+  border-radius: 8px;
+  overflow: scroll;
+  max-height: 70vh;
+}
+
+.gridHeader {
+  text-align: center;
+  background-color: #ffffff;
+  padding: 1rem;
+  font-weight: bold;
+  font-size: 14px;
+  color: #666;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  border-bottom: 1px solid #ddd;
+}
+
+.gridCell {
+  background-color: #ffffff;
+  position: relative;
+  padding: 3rem;
+}
+
+/* Coluna de horários */
+.timeColumn {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #f4f4f4;
+  text-align: center;
+  font-size: 12px;
+  font-weight: bold;
+  padding: 1rem 0;
+  color: #666;
+}
+
+.timeColumnHeader {
+  text-align: center;
+  background-color: #f4f4f4;
+  font-size: 14px;
+  font-weight: bold;
+  padding: 1rem;
+  color: #333;
+  position: sticky;
+  top: 0;
+  left: 0;
+  z-index: 10;
+  border-bottom: 1px solid #ddd;
+}
+
+/* Eventos */
+.event {
+  position: absolute;
+  left: 0%;
+  width: 100%;
+  padding: 8px;
+  font-size: 12px;
+  color: white;
+  line-height: 1.2;
+  border: 1px dashed var(--gray-dark);
+  cursor: pointer;
+  text-wrap: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+
+.event.red {
+  background-color: #ff4d4f;
+}
+
+.event.yellow {
+  background-color: #ffeb3b;
+  color: #000;
+}
+
+.event.green {
+  background-color: #4caf50;
+}
+
+.event.blue {
+  background-color: #2196f3;
+  color: #ffffff;
+}
+
+.event.gray {
+  background-color: #9e9e9e;
+}
+
+@media (max-width: 768px) {
+  .calendarGrid {
+    grid-template-columns: 80px repeat(7, 1fr);
+  }
+
+  .timeColumn {
+    font-size: 10px;
+  }
+
+  .gridHeader {
+    font-size: 12px;
+    padding: 0.8rem;
+  }
+
+  .event {
+    font-size: 10px;
+    padding: 6px;
+  }
+
+  .calendarHeader h2 {
+    font-size: 18px;
+  }
+}
+
+/* Barra de ferramentas acima do calendário */
+.calendarToolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 0;
+  width: 90%;
+}
+
+/* Contêiner dos filtros */
+.filters {
+  display: flex;
+  gap: 10px;
+}
+
+/* Botões de filtro */
+.filterButton {
+  background-color: var(--background);
+  border: 1px solid var(--gray-dark);
+  color: #333;
+  font-size: 14px;
+  padding: 8px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+  transition: all 0.2s ease;
+}
+
+.filterButton:hover {
+  background-color: var(--secondary);
+  color: #000;
+}
+
+/* Botão de adicionar novo agendamento */
+.addButton {
+  background-color: var(--highlight);
+  color: #000;
+  font-weight: bold;
+  font-size: 14px;
+  padding: 8px 15px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+  transition: background-color 0.2s ease;
+}
+
+.addButton:hover {
+  background-color: var(--highlight-dark);
+}
+
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.25);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal {
+  display: flex;
+  flex-direction: column;
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  width: 400px;
+  max-width: 90%;
+}
+
+.closeButton {
+  background: #f44336;
+  color: white;
+  border: none;
+  padding: 5px 15px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+  margin-top: 10px;
+  align-self: flex-end;
+}

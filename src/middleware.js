@@ -8,11 +8,18 @@ export async function middleware(request) {
   const token = cookie.get(TOKEN_KEY);
 
   const protectedRoutes = [
+    "/",
     "/calendar",
     "/professionals",
     "/students",
     "/settings",
   ];
+
+  const isHomePage = request.nextUrl.pathname === "/";
+
+  if (isHomePage && token) {
+    return NextResponse.redirect(new URL("/calendar", request.url));
+  }
 
   const isProtectedRoute = protectedRoutes.includes(request.nextUrl.pathname);
 
@@ -25,6 +32,7 @@ export async function middleware(request) {
 
 export const config = {
   matcher: [
+    "/",
     "/calendar/:path*",
     "/professionals/:path*",
     "/students/:path*",
