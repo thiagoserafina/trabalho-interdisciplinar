@@ -114,3 +114,25 @@ export async function addProfessional(data) {
   const response = await axiosInstance.post("/api/", data);
   return response.status;
 }
+
+export async function getStudents() {
+  const response = await axiosInstance.get("/api/alunos");
+  return response.data;
+}
+
+export async function addStudent(data) {
+  console.log(data);
+  const response = await axiosInstance.post("/api/alunos", data);
+  console.log(response.data);
+  return response.data;
+}
+
+export async function updateStudent(id, data) {
+  const response = await axiosInstance.put(`/api/alunos/${id}`, data);
+  return response.data;
+}
+
+export async function deleteStudent(id) {
+  const response = await axiosInstance.delete(`/api/alunos/${id}`);
+  return response.status;
+}
