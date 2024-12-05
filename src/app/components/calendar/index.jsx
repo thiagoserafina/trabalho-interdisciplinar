@@ -1,17 +1,141 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import styles from "./Calendario.module.css";
-import { LucideChevronLeft, LucideChevronRight } from "lucide-react";
+import {
+  LucideChevronLeft,
+  LucideChevronRight,
+  LucideTrash,
+} from "lucide-react";
+import { addEvent, deleteEvent, getEvents } from "@/service/api";
+import axios from "axios";
 
 export default function Calendar() {
+  const [events, setEvents] = useState([]);
+  const [alunos, setAlunos] = useState([]);
+  const [funcionarios, setFuncionarios] = useState([]);
   const [currentWeek, setCurrentWeek] = useState(new Date());
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [isModalVisible, setModalVisible] = useState(false);
+  const [isAddModalVisible, setAddModalVisible] = useState(false);
+  const [newEvent, setNewEvent] = useState({
+    id_aluno: "",
+    id_funcionario: "",
+    data_agendamento: "",
+    hora_inicio: "",
+    hora_fim: "",
+    tipo_atendimento: "",
+    cancelado: false,
+    sala: "",
+  });
+
+  const fetchEvents = async () => {
+    try {
+      const eventData = await getEvents();
+      setEvents(eventData);
+      console.log("Evento atualizado", eventData);
+    } catch (error) {
+      console.error("Erro ao carregar eventos:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchEvents();
+  }, []);
+
+  const fetchAlunos = async () => {
+    try {
+      const response = await fetch("http://localhost:3030/api/alunos", {
+        method: "GET",
+      });
+
+      if (!response.ok) {
+        throw new Error("Erro ao buscar alunos");
+      }
+
+      const alunosData = await response.json();
+      setAlunos(alunosData);
+    } catch (error) {
+      console.error("Erro ao carregar alunos:", error);
+    }
+  };
+
+  const fetchFuncionarios = async () => {
+    try {
+      const response = await fetch("http://localhost:3030/api/funcionarios", {
+        method: "GET",
+      });
+
+      if (!response.ok) {
+        throw new Error("Erro ao buscar funcionários");
+      }
+
+      const funcionariosData = await response.json();
+      setFuncionarios(funcionariosData);
+    } catch (error) {
+      console.error("Erro ao carregar funcionários:", error);
+    }
+  };
+
+  const handleOpenAddModal = () => {
+    fetchAlunos();
+    fetchFuncionarios();
+    setAddModalVisible(true);
+  };
+
+  const handleCloseAddModal = () => {
+    setAddModalVisible(false);
+    setNewEvent({
+      id_aluno: "",
+      id_funcionario: "",
+      data_agendamento: "",
+      hora_inicio: "",
+      hora_fim: "",
+      tipo_atendimento: "",
+      cancelado: false,
+      sala: "",
+    });
+  };
+
+  const handleAddNewEvent = async () => {
+    try {
+      const response = await fetch("http://localhost:3030/api/agendamentos", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(newEvent),
+      });
+
+      if (!response.ok) {
+        throw new Error("Erro ao adicionar agendamento");
+      }
+
+      await fetchEvents();
+      handleCloseAddModal();
+    } catch (error) {
+      console.error("Erro ao adicionar evento:", error);
+    }
+  };
 
   const handleEventClick = (event) => {
     setSelectedEvent(event);
     setModalVisible(true);
+  };
+
+  const handleDeleteEvent = async (id) => {
+    try {
+      const response = await deleteEvent(id);
+
+      if (response === 200) {
+        setEvents((prevEvents) =>
+          prevEvents.filter((event) => event.id_agendamento !== id)
+        );
+        setModalVisible(false);
+      }
+    } catch (error) {
+      console.error("Erro ao deletar evento:", error);
+    }
   };
 
   const handleCloseModal = () => {
@@ -19,12 +143,11 @@ export default function Calendar() {
     setModalVisible(false);
   };
 
-  // Gera os dias da semana com base na data fornecida
   const generateWeek = (date) => {
     const startOfWeek = new Date(date);
-    const dayOfWeek = startOfWeek.getDay(); // Dia da semana (0 = Domingo)
-    startOfWeek.setDate(startOfWeek.getDate() - dayOfWeek); // Ajusta para o início da semana
-    startOfWeek.setHours(0, 0, 0, 0); // Remove a hora para evitar discrepâncias
+    const dayOfWeek = startOfWeek.getDay();
+    startOfWeek.setDate(startOfWeek.getDate() - dayOfWeek);
+    startOfWeek.setHours(0, 0, 0, 0);
     const week = [];
     for (let i = 0; i < 7; i++) {
       const day = new Date(startOfWeek);
@@ -52,184 +175,6 @@ export default function Calendar() {
     setCurrentWeek(new Date());
   };
 
-  const events = [
-    // 24/11
-    {
-      tipo_atendimento: "Fisioterapia",
-      alunoNome: "Carlos Oliveira",
-      funcionarioNome: "Ana Silva",
-      especialidade: "Fisioterapeuta",
-      sala: "Sala 01",
-      date: "2024-11-24",
-      startTime: "08:00",
-      endTime: "09:00",
-      status: "Concluído",
-      color: "yellow",
-    },
-    {
-      tipo_atendimento: "Fonoaudiologia",
-      alunoNome: "Julia Santos",
-      funcionarioNome: "Maria Souza",
-      especialidade: "Fonoaudióloga",
-      sala: "Sala 02",
-      date: "2024-11-24",
-      startTime: "10:00",
-      endTime: "10:30",
-      status: "Cancelado",
-      color: "gray",
-    },
-    // 25/11
-    {
-      tipo_atendimento: "Psicologia",
-      alunoNome: "Mariana Lima",
-      funcionarioNome: "Carla Mendes",
-      especialidade: "Psicóloga",
-      sala: "Sala 03",
-      date: "2024-11-25",
-      startTime: "11:00",
-      endTime: "12:00",
-      status: "Concluído",
-      color: "yellow",
-    },
-    {
-      tipo_atendimento: "Fisioterapia",
-      alunoNome: "Joice Pereira",
-      funcionarioNome: "Ana Silva",
-      especialidade: "Fisioterapeuta",
-      sala: "Sala 01",
-      date: "2024-11-25",
-      startTime: "07:30",
-      endTime: "08:00",
-      status: "Atrasado",
-      color: "red",
-    },
-    // 26/11
-    {
-      tipo_atendimento: "Nutrição",
-      alunoNome: "Lucas Almeida",
-      funcionarioNome: "Renata Borges",
-      especialidade: "Nutricionista",
-      sala: "Sala 04",
-      date: "2024-11-26",
-      startTime: "08:30",
-      endTime: "09:00",
-      status: "Concluído",
-      color: "yellow",
-    },
-    {
-      tipo_atendimento: "Fonoaudiologia",
-      alunoNome: "Ruan Silva",
-      funcionarioNome: "Maria Souza",
-      especialidade: "Fonoaudióloga",
-      sala: "Sala 02",
-      date: "2024-11-26",
-      startTime: "09:00",
-      endTime: "09:30",
-      status: "Concluído",
-      color: "yellow",
-    },
-    // 27/11
-    {
-      tipo_atendimento: "Psicologia",
-      alunoNome: "Beatriz Rocha",
-      funcionarioNome: "Carla Mendes",
-      especialidade: "Psicóloga",
-      sala: "Sala 03",
-      date: "2024-11-27",
-      startTime: "14:00",
-      endTime: "15:00",
-      status: "Em atendimento",
-      color: "green",
-    },
-    {
-      tipo_atendimento: "Fisioterapia",
-      alunoNome: "Pedro Nunes",
-      funcionarioNome: "Ana Silva",
-      especialidade: "Fisioterapeuta",
-      sala: "Sala 01",
-      date: "2024-11-27",
-      startTime: "16:00",
-      endTime: "17:00",
-      status: "Confirmado",
-      color: "blue",
-    },
-    // 28/11
-    {
-      tipo_atendimento: "Fisioterapia",
-      alunoNome: "Bruno Costa",
-      funcionarioNome: "Ana Silva",
-      especialidade: "Fisioterapeuta",
-      sala: "Sala 01",
-      date: "2024-11-28",
-      startTime: "10:00",
-      endTime: "10:30",
-      status: "Em atendimento",
-      color: "green",
-    },
-    {
-      tipo_atendimento: "Fonoaudiologia",
-      alunoNome: "Bruno Costa",
-      funcionarioNome: "Maria Souza",
-      especialidade: "Fonoaudióloga",
-      sala: "Sala 01",
-      date: "2024-11-28",
-      startTime: "10:45",
-      endTime: "11:15",
-      status: "Em atendimento",
-      color: "green",
-    },
-    // 29/11
-    {
-      tipo_atendimento: "Nutrição",
-      alunoNome: "Fernanda Silva",
-      funcionarioNome: "Renata Borges",
-      especialidade: "Nutricionista",
-      sala: "Sala 04",
-      date: "2024-11-29",
-      startTime: "09:00",
-      endTime: "09:30",
-      status: "Confirmado",
-      color: "blue",
-    },
-    {
-      tipo_atendimento: "Psicologia",
-      alunoNome: "Carlos Oliveira",
-      funcionarioNome: "Carla Mendes",
-      especialidade: "Psicóloga",
-      sala: "Sala 03",
-      date: "2024-11-29",
-      startTime: "15:00",
-      endTime: "16:00",
-      status: "Cancelado",
-      color: "gray",
-    },
-    // 30/11
-    {
-      tipo_atendimento: "Fisioterapia",
-      alunoNome: "Joice Pereira",
-      funcionarioNome: "Ana Silva",
-      especialidade: "Fisioterapeuta",
-      sala: "Sala 01",
-      date: "2024-11-30",
-      startTime: "08:00",
-      endTime: "09:00",
-      status: "Concluído",
-      color: "yellow",
-    },
-    {
-      tipo_atendimento: "Fonoaudiologia",
-      alunoNome: "Lucas Almeida",
-      funcionarioNome: "Maria Souza",
-      especialidade: "Fonoaudióloga",
-      sala: "Sala 02",
-      date: "2024-11-30",
-      startTime: "10:00",
-      endTime: "10:30",
-      status: "Confirmado",
-      color: "blue",
-    },
-  ];
-
   // Horários do calendário
   const hours = [
     "07:00",
@@ -254,10 +199,12 @@ export default function Calendar() {
           <button className={styles.filterButton} onClick={handleToday}>
             Hoje
           </button>
-          <button className={styles.filterButton}>Semana</button>
+          {/* <button className={styles.filterButton}>Semana</button> */}
         </div>
 
-        <button className={styles.addButton}>+ Novo agendamento</button>
+        <button className={styles.addButton} onClick={handleOpenAddModal}>
+          + Novo agendamento
+        </button>
       </div>
       <div className={styles.calendarContainer}>
         <div className={styles.calendarHeader}>
@@ -292,17 +239,17 @@ export default function Calendar() {
                 <div key={`${index}-${dayIndex}`} className={styles.gridCell}>
                   {events
                     .filter((event) => {
-                      const eventDateISO = new Date(event.date)
+                      const eventDateISO = new Date(event.data_agendamento)
                         .toISOString()
                         .split("T")[0]; // Formata a data do evento
                       const dayISO = day.toISOString().split("T")[0]; // Formata o dia atual
 
                       const eventStart =
-                        parseInt(event.startTime.split(":")[0], 10) * 60 +
-                        parseInt(event.startTime.split(":")[1], 10);
+                        parseInt(event.hora_inicio.split(":")[0], 10) * 60 +
+                        parseInt(event.hora_inicio.split(":")[1], 10);
                       const eventEnd =
-                        parseInt(event.endTime.split(":")[0], 10) * 60 +
-                        parseInt(event.endTime.split(":")[1], 10);
+                        parseInt(event.hora_fim.split(":")[0], 10) * 60 +
+                        parseInt(event.hora_fim.split(":")[1], 10);
                       const currentHour = parseInt(hour.split(":")[0], 10) * 60;
 
                       return (
@@ -313,16 +260,19 @@ export default function Calendar() {
                     })
                     .map((event, eventIndex) => {
                       const startHour = parseInt(
-                        event.startTime.split(":")[0],
+                        event.hora_inicio.split(":")[0],
                         10
                       );
                       const startMinutes = parseInt(
-                        event.startTime.split(":")[1],
+                        event.hora_inicio.split(":")[1],
                         10
                       );
-                      const endHour = parseInt(event.endTime.split(":")[0], 10);
+                      const endHour = parseInt(
+                        event.hora_fim.split(":")[0],
+                        10
+                      );
                       const endMinutes = parseInt(
-                        event.endTime.split(":")[1],
+                        event.hora_fim.split(":")[1],
                         10
                       );
 
@@ -360,10 +310,10 @@ export default function Calendar() {
                               justifyContent: "space-between",
                             }}
                           >
-                            <strong>{event.alunoNome}</strong>
+                            <strong>{event.nome_aluno}</strong>
                             {event.sala} <br />
                           </div>
-                          {event.funcionarioNome} ({event.especialidade})
+                          {event.nome_funcionario} ({event.nome_especialidade})
                         </div>
                       );
                     })}
@@ -378,11 +328,11 @@ export default function Calendar() {
           <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
             <h2>{selectedEvent.tipo_atendimento}</h2>
             <p>
-              <strong>Aluno:</strong> {selectedEvent.alunoNome}
+              <strong>Aluno:</strong> {selectedEvent.nome_aluno}
             </p>
             <p>
-              <strong>Profissional:</strong> {selectedEvent.funcionarioNome} (
-              {selectedEvent.especialidade})
+              <strong>Profissional:</strong> {selectedEvent.nome_funcionario} (
+              {selectedEvent.nome_especialidade})
             </p>
             <p>
               <strong>Sala:</strong> {selectedEvent.sala}
@@ -391,12 +341,158 @@ export default function Calendar() {
               <strong>Status:</strong> {selectedEvent.status}
             </p>
             <p>
-              <strong>Horário:</strong> {selectedEvent.startTime} -{" "}
-              {selectedEvent.endTime}
+              <strong>Horário:</strong> {selectedEvent.hora_inicio} -{" "}
+              {selectedEvent.hora_fim}
             </p>
-            <button onClick={handleCloseModal} className={styles.closeButton}>
-              Fechar
-            </button>
+            <div className={styles.actionButtons}>
+              <button onClick={handleCloseModal} className={styles.closeButton}>
+                Fechar
+              </button>
+
+              <div
+                className={styles.iconButton}
+                title="Deletar Agendamento"
+                onClick={() => {
+                  if (selectedEvent && selectedEvent.id_agendamento) {
+                    handleDeleteEvent(selectedEvent.id_agendamento);
+                  } else {
+                    console.error("ID do agendamento não encontrado!");
+                  }
+                }}
+              >
+                <LucideTrash color="red" size={20} />
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {isAddModalVisible && (
+        <div className={styles.modalOverlay} onClick={handleCloseAddModal}>
+          <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
+            <h2>Novo Agendamento</h2>
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                handleAddNewEvent();
+              }}
+            >
+              <div className={styles.formGroup}>
+                <label>Aluno</label>
+                <select
+                  value={newEvent.id_aluno}
+                  onChange={(e) =>
+                    setNewEvent({ ...newEvent, id_aluno: e.target.value })
+                  }
+                  required
+                >
+                  <option value="" disabled>
+                    Selecione um aluno
+                  </option>
+                  {alunos.map((aluno) => (
+                    <option key={aluno.id_aluno} value={aluno.id_aluno}>
+                      {aluno.nome_aluno}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div className={styles.formGroup}>
+                <label>Funcionário</label>
+                <select
+                  value={newEvent.id_funcionario}
+                  onChange={(e) =>
+                    setNewEvent({ ...newEvent, id_funcionario: e.target.value })
+                  }
+                  required
+                >
+                  <option value="" disabled>
+                    Selecione um funcionário
+                  </option>
+                  {funcionarios.map((funcionario) => (
+                    <option
+                      key={funcionario.id_funcionario}
+                      value={funcionario.id_funcionario}
+                    >
+                      {funcionario.nome_funcionario}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div className={styles.formGroup}>
+                <label>Data</label>
+                <input
+                  type="date"
+                  value={newEvent.data_agendamento}
+                  onChange={(e) =>
+                    setNewEvent({
+                      ...newEvent,
+                      data_agendamento: e.target.value,
+                    })
+                  }
+                  required
+                />
+              </div>
+              <div className={styles.formGroup}>
+                <label>Hora de Início</label>
+                <input
+                  type="time"
+                  value={newEvent.hora_inicio}
+                  onChange={(e) =>
+                    setNewEvent({ ...newEvent, hora_inicio: e.target.value })
+                  }
+                  required
+                />
+              </div>
+              <div className={styles.formGroup}>
+                <label>Hora de Fim</label>
+                <input
+                  type="time"
+                  value={newEvent.hora_fim}
+                  onChange={(e) =>
+                    setNewEvent({ ...newEvent, hora_fim: e.target.value })
+                  }
+                  required
+                />
+              </div>
+              <div className={styles.formGroup}>
+                <label>Tipo de Atendimento</label>
+                <input
+                  type="text"
+                  value={newEvent.tipo_atendimento}
+                  onChange={(e) =>
+                    setNewEvent({
+                      ...newEvent,
+                      tipo_atendimento: e.target.value,
+                    })
+                  }
+                  required
+                />
+              </div>
+              <div className={styles.formGroup}>
+                <label>Sala</label>
+                <input
+                  type="text"
+                  value={newEvent.sala}
+                  onChange={(e) =>
+                    setNewEvent({ ...newEvent, sala: e.target.value })
+                  }
+                  required
+                />
+              </div>
+
+              <div className={styles.actionButtons}>
+                <button type="submit" className={styles.addButton}>
+                  Adicionar
+                </button>
+                <button
+                  type="button"
+                  onClick={handleCloseAddModal}
+                  className={styles.closeButton}
+                >
+                  Cancelar
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}
