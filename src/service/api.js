@@ -111,8 +111,36 @@ export async function deleteEvent(id) {
 }
 
 export async function addProfessional(data) {
-  const response = await axiosInstance.post("/api/", data);
+  const response = await axiosInstance.post("/api/funcionarios", data);
   return response.status;
+}
+
+export async function updateProfessional(id, data) {
+  const response = await axiosInstance.put(`/api/funcionarios/${id}`, data);
+  return response.status;
+}
+
+export async function getProfessionals() {
+  const response = await axiosInstance.get("/api/funcionarios");
+  return response.data;
+}
+
+export async function getSpecialties() {
+  const response = await axiosInstance.get("/api/especialidades");
+  return response.data;
+}
+
+export async function addSpecialty(data) {
+  const response = await axiosInstance.post("/api/especialidades", data);
+  return response.status;
+}
+
+export async function getProfessionalsBySpecialty(id) {
+  const response = await axiosInstance.get(
+    `/api/funcionarios/especialidade/${id}`
+  );
+  console.log(response.data);
+  return response.data;
 }
 
 export async function getStudents() {

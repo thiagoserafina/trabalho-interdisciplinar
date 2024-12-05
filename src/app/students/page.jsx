@@ -82,6 +82,7 @@ const StudentsPage = () => {
     const updatedStudents = await getStudents();
     setStudents(updatedStudents);
     setIsModalOpen(false);
+    setNewStudent({});
   };
 
   const handleInputStudentChange = (e) => {
@@ -122,7 +123,7 @@ const StudentsPage = () => {
                 <th>Aluno</th>
                 <th>Data nascimento</th>
                 <th>Contato responsável</th>
-                <th className="diagnosis-title">Diagnóstico</th>
+                <th style={{ textAlign: "left" }}>Diagnóstico</th>
                 <th></th>
               </tr>
             </thead>
@@ -148,16 +149,6 @@ const StudentsPage = () => {
               ))}
             </tbody>
           </table>
-
-          <div className="pagination">
-            <button>
-              <ArrowLeft size={18} />
-            </button>
-            <span>1</span>
-            <button>
-              <ArrowRight size={18} />
-            </button>
-          </div>
         </div>
 
         {isDrawerOpen && (
