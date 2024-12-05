@@ -109,3 +109,8 @@ export async function deleteEvent(id) {
   });
   return response.status;
 }
+
+export async function addProfessional(data) {
+  const response = await axiosInstance.post("/api/", data);
+  return response.status;
+}
