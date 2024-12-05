@@ -1,62 +1,47 @@
 "use client";
 
-import  { useState } from "react";
+import { useEffect, useState } from "react";
 import "./styles.css";
 
-
 import Layout from "../components/layout";
+import {
+  addProfessional,
+  addSpecialty,
+  getProfessionalsBySpecialty,
+  getSpecialties,
+  updateProfessional,
+} from "@/service/api";
 
-  
+const disponibilidadePadrao = {
+  segunda: ["08:00-12:00", "14:00-18:00"],
+  terca: ["08:00-12:00", "14:00-18:00"],
+  quarta: ["08:00-12:00", "14:00-18:00"],
+  quinta: ["08:00-12:00", "14:00-18:00"],
+  sexta: ["08:00-12:00", "14:00-18:00"],
+};
+
 const ProfessionalsPage = () => {
-
-  const [selectedSpecialty, setSelectedSpecialty] = useState("");  
+  const [specialties, setSpecialties] = useState([]);
+  const [professionals, setProfessionals] = useState([]);
+  const [selectedSpecialty, setSelectedSpecialty] = useState("");
   const [selectedProfessional, setSelectedProfessional] = useState(null);
   const [workHours, setWorkHours] = useState({});
-  const [isModalOpen, setIsModalOpen] = useState(false); 
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const [isSpecialtyModalOpen, setIsSpecialtyModalOpen] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
 
   const [newProfessional, setNewProfessional] = useState({
-    name: "",
+    nome_funcionario: "",
     cpf: "",
     email: "",
-    phone: "",
-    specialty: "",
+    telefone: "",
+    id_especialidade: "",
+    disponibilidade: disponibilidadePadrao,
   });
 
-  const [newSpecialty, setNewSpecialty] = useState({ id: "", name: "" });
-
-
-  const specialties = [
-    { id: "fonoaudiologa", name: "Fonoaudióloga" },
-    { id: "psicologa", name: "Psicóloga" },
-  ];
-
-  const professionals = [
-    {
-      id: 1,
-      name: "Ana dos Santos",
-      cpf: "893.310.590-51",
-      email: "anasantos@apae.com.br",
-      phone: "(48) 91234-5678",
-      specialty: "fonoaudiologa",
-    },
-    {
-      id: 2,
-      name: "Camila Almeida",
-      cpf: "123.456.789-00",
-      email: "camila@apae.com.br",
-      phone: "(48) 98765-4321",
-      specialty: "psicologa",
-    },
-    {
-      id: 3,
-      name: "Clara Fernandes",
-      cpf: "321.654.987-00",
-      email: "clara@apae.com.br",
-      phone: "(48) 99999-9999",
-      specialty: "fonoaudiologa",
-    },
-  ];
+  const [newSpecialty, setNewSpecialty] = useState({
+    nome_especialidade: "",
+  });
 
   const daysOfWeek = [
     "Segunda",
@@ -68,13 +53,30 @@ const ProfessionalsPage = () => {
     "Domingo",
   ];
 
-  const handleSpecialtyChange = (event) => {
-    setSelectedSpecialty(event.target.value);
-    setSelectedProfessional(null);
-  };
+  useEffect(() => {
+    const loadSpecialties = async () => {
+      try {
+        const specialtiesData = await getSpecialties();
+        setSpecialties(specialtiesData);
+      } catch (error) {
+        console.error("Erro ao carregar especialidades:", error);
+      }
+    };
+    loadSpecialties();
+  }, []);
 
-  const handleProfessionalClick = (professional) => {
-    setSelectedProfessional(professional);
+  const handleSpecialtyChange = async (event) => {
+    const selectedId = event.target.value;
+    setSelectedSpecialty(selectedId);
+    setSelectedProfessional(null);
+
+    try {
+      const professionalsData = await getProfessionalsBySpecialty(selectedId);
+      setProfessionals(professionalsData);
+    } catch (error) {
+      console.error("Erro ao carregar profissionais:", error);
+      setProfessionals([]);
+    }
   };
 
   const handleSpecialtyInputChange = (e) => {
@@ -85,42 +87,87 @@ const ProfessionalsPage = () => {
     }));
   };
 
-
-  const handleSpecialtyModalSubmit = () => {
-    console.log("Nova especialidade:", newSpecialty);
-    alert("Nova especialidade adicionada com sucesso!");
-    setIsSpecialtyModalOpen(false);
+  const handleAddProfessional = async () => {
+    try {
+      await addProfessional(newProfessional);
+      alert("Profissional adicionado com sucesso!");
+      setIsModalOpen(false);
+      setSelectedSpecialty(""); // Reset para forçar recarregamento
+    } catch (error) {
+      console.error("Erro ao adicionar profissional:", error);
+      alert("Erro ao adicionar profissional.");
+    }
   };
 
+  const handleEditProfessional = async () => {
+    if (selectedProfessional) {
+      try {
+        await updateProfessional(selectedProfessional.id_funcionario, {
+          ...selectedProfessional,
+          disponibilidade: workHours, // Enviar horários no formato JSONB
+        });
+        alert("Profissional atualizado com sucesso!");
+        setIsEditing(false);
 
-  const handleCheckboxChange = (day) => {
+        // Recarregar a lista de profissionais para a especialidade selecionada
+        if (selectedSpecialty) {
+          const updatedProfessionals = await getProfessionalsBySpecialty(
+            selectedSpecialty
+          );
+          setProfessionals(updatedProfessionals);
+        }
+      } catch (error) {
+        console.error("Erro ao editar profissional:", error);
+        alert("Erro ao editar profissional.");
+      }
+    }
+  };
+
+  const handleAddSpecialty = async () => {
+    try {
+      await addSpecialty(newSpecialty);
+      alert("Especialidade adicionada com sucesso!");
+      setNewSpecialty({ nome_especialidade: "" });
+      setIsSpecialtyModalOpen(false);
+
+      const updatedSpecialties = await getSpecialties();
+      setSpecialties(updatedSpecialties);
+    } catch (error) {
+      console.error("Erro ao adicionar especialidade:", error);
+      alert("Erro ao adicionar especialidade.");
+    }
+  };
+
+  const handleTimeChange = (day, index, type, value) => {
+    setWorkHours((prev) => {
+      const updatedDay = [...prev[day]];
+      const [start, end] = updatedDay[index]?.split("-") || ["", ""];
+      updatedDay[index] =
+        type === "start" ? `${value}-${end}` : `${start}-${value}`;
+      return { ...prev, [day]: updatedDay };
+    });
+  };
+
+  const addTimeSlot = (day) => {
     setWorkHours((prev) => ({
       ...prev,
-      [day]: { ...prev[day], noWork: !prev[day]?.noWork },
+      [day]: [...(prev[day] || []), "08:00-12:00"], // Adicionar slot padrão
     }));
   };
 
-  const handleTimeChange = (day, type, value) => {
-    setWorkHours((prev) => ({
-      ...prev,
-      [day]: { ...prev[day], [type]: value },
-    }));
+  const removeTimeSlot = (day, index) => {
+    setWorkHours((prev) => {
+      const updatedDay = [...prev[day]];
+      updatedDay.splice(index, 1);
+      return { ...prev, [day]: updatedDay };
+    });
   };
 
-  const handleSave = () => {
-    console.log("Horários salvos:", workHours);
-    alert("Horários salvos com sucesso!");
-  };
-
-  const filteredProfessionals = professionals.filter(
-    (professional) => professional.specialty === selectedSpecialty
-  );
-
-  const handleModalSubmit = () => {
-    console.log("Novo profissional:", newProfessional);
-    alert("Novo profissional adicionado com sucesso!");
-    setIsModalOpen(false);
-  };
+  useEffect(() => {
+    if (selectedProfessional?.disponibilidade) {
+      setWorkHours(selectedProfessional.disponibilidade);
+    }
+  }, [selectedProfessional]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -130,263 +177,358 @@ const ProfessionalsPage = () => {
     }));
   };
 
+  const handleSelectedProfessionalChange = (e) => {
+    const { name, value } = e.target;
+    setSelectedProfessional((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
 
   return (
     <Layout>
       <div className="flex flex-col h-screen bg-gray p-6 professionals-page">
-      <header className="mb-6">
-        <div className="header">
-          <h2>Profissionais</h2>
-        </div>
-        <div className="flex justify-between items-center mb-1">
-          <select
-            value={selectedSpecialty}
-            onChange={handleSpecialtyChange}
-            className="p-2 w-1/6 text-sm border border-gray-300 rounded-md bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-300"
-          >
-            <option value="">Selecione uma especialidade</option>
-            {specialties.map((specialty) => (
-              <option key={specialty.id} value={specialty.id}>
-                {specialty.name}
-              </option>
-            ))}
-          </select>
-          <div className="flex gap-4">
-          <button
-              className="bg-gray-200 text-black px-4 py-2 text-sm rounded-md shadow hover:bg-gray-300"
-              onClick={() => setIsSpecialtyModalOpen(true)}
-            >
-              + Nova especialidade
-            </button>
-            <button
-              className="bg-yellow-400 text-black px-4 py-2 text-sm rounded-md shadow hover:bg-yellow-500"
-              onClick={() => setIsModalOpen(true)}
-            >
-              + Novo profissional
-            </button>
+        <header className="mb-6">
+          <div className="header">
+            <h2>Profissionais</h2>
           </div>
-        </div>
-      </header>
-
-      <div className="flex gap-6 h-full bg-gray ">
-        <div className="w-1/6 bg-gray-100 rounded-lg shadow-md p-4 h-screen overflow-y-auto">
-          <ul>
-            {filteredProfessionals.map((professional) => (
-              <li
-                key={professional.id}
-                className={`p-3 rounded-md cursor-pointer ${
-                  selectedSpecialty &&
-                  "underline underline-offset-4 decoration-yellow-400 font-semibold text-center"
-                }`}
-                onClick={() => handleProfessionalClick(professional)}
-              >
-                {professional.name}
-              </li>
-            ))}
-            {filteredProfessionals.length === 0 && (
-              <p className="text-gray-500 text-sm text-center">Nenhum profissional encontrado.</p>
-            )}
-          </ul>
-        </div>
-
-        {selectedProfessional && (
-          <div className="w-full bg-gray-100 rounded-lg shadow-md p-6 h-screen">
-            <h2 className="text-xl font-bold mb-4">Informações do Profissional</h2>
-            <form>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-semibold mb-1">Nome</label>
-                  <input
-                    type="text"
-                    defaultValue={selectedProfessional.name}
-                    className="w-full p-3 border border-gray-300 rounded-lg"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-semibold mb-1">CPF</label>
-                  <input
-                    type="text"
-                    defaultValue={selectedProfessional.cpf}
-                    className="w-full p-3 border border-gray-300 rounded-lg"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-semibold mb-1">Especialidade</label>
-                  <input
-                    type="text"
-                    value={
-                      specialties.find((s) => s.id === selectedSpecialty)?.name ||
-                      ""
-                    }
-                    disabled
-                    className="w-full p-3 border border-gray-300 rounded-lg bg-gray-100"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-semibold mb-1">Email</label>
-                  <input
-                    type="email"
-                    defaultValue={selectedProfessional.email}
-                    className="w-full p-3 border border-gray-300 rounded-lg"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-semibold mb-1">Telefone</label>
-                  <input
-                    type="tel"
-                    defaultValue={selectedProfessional.phone}
-                    className="w-full p-3 border border-gray-300 rounded-lg"
-                  />
-                </div>
-              </div>
-
-              <h3 className="text-xl font-bold mt-6 mb-4">Horários de Expediente</h3>
-              {daysOfWeek.map((day) => (
-                <div key={day} className="flex items-center gap-4 mb-2 text-sm">
-                  <label className="w-24">{day}</label>
-                  <input
-                    type="time"
-                    className="w-1/4 p-2 border border-gray-300 rounded-lg"
-                    disabled={workHours[day]?.noWork}
-                    value={workHours[day]?.start || ""}
-                    onChange={(e) =>
-                      handleTimeChange(day, "start", e.target.value)
-                    }
-                  />
-                  <span>-</span>
-                  <input
-                    type="time"
-                    className="w-1/4 p-2 border border-gray-300 rounded-lg"
-                    disabled={workHours[day]?.noWork}
-                    value={workHours[day]?.end || ""}
-                    onChange={(e) =>
-                      handleTimeChange(day, "end", e.target.value)
-                    }
-                  />
-                  <div className="flex items-center gap-2">
-                    <input
-                      type="checkbox"
-                      checked={workHours[day]?.noWork || false}
-                      onChange={() => handleCheckboxChange(day)}
-                    />
-                    <span>Sem expediente</span>
-                  </div>
-                </div>
+          <div className="flex justify-between items-center mb-1">
+            <select
+              value={selectedSpecialty}
+              onChange={handleSpecialtyChange}
+              className="p-2 w-1/6 text-sm border border-gray-300 rounded-md bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-300"
+            >
+              <option value="">Selecione uma especialidade</option>
+              {specialties.map((specialty) => (
+                <option
+                  key={specialty.id_especialidade}
+                  value={specialty.id_especialidade}
+                >
+                  {specialty.nome_especialidade}
+                </option>
               ))}
-
+            </select>
+            <div className="flex gap-4">
               <button
-                type="button"
-                className="mt-4 bg-yellow-400 text-black px-6 py-2 rounded-lg shadow-md hover:bg-yellow-500"
-                onClick={handleSave}
+                className="bg-gray-200 text-black px-4 py-2 text-sm rounded-md shadow hover:bg-gray-300"
+                onClick={() => setIsSpecialtyModalOpen(true)}
               >
-                Salvar
+                + Nova especialidade
               </button>
-            </form>
+              <button
+                className="bg-yellow-400 text-black px-4 py-2 text-sm rounded-md shadow hover:bg-yellow-500"
+                onClick={() => setIsModalOpen(true)}
+              >
+                + Novo profissional
+              </button>
+            </div>
           </div>
-        )}
-      </div>
+        </header>
 
-      
+        <div className="flex gap-6 h-100 bg-gray ">
+          <div className="w-1/6 bg-gray-100 rounded-lg shadow-md p-4 overflow-y-auto profissional-list">
+            <ul>
+              {professionals.map((professional) => (
+                <li
+                  key={professional.id_funcionario}
+                  className="p-3 rounded-md cursor-pointer underline underline-offset-4 decoration-yellow-400 font-semibold text-center"
+                  onClick={() => setSelectedProfessional(professional)}
+                >
+                  {professional.nome_funcionario}
+                </li>
+              ))}
+              {professionals.length === 0 && (
+                <p className="text-gray-500 text-sm text-center">
+                  Nenhum profissional encontrado.
+                </p>
+              )}
+            </ul>
+          </div>
 
-    {isModalOpen && (
-            <div className="fixed inset-0 bg-gray-800 bg-opacity-50 flex justify-center items-center z-50">
-              <div className="bg-white rounded-lg shadow-lg p-6 w-1/3">
-              <div className="header">
-                <h2>Adicionar novo profissional</h2>
-              </div>
-                <form onSubmit={(e) => e.preventDefault()}>
-                  <div className="mb-4">
-                    <label className="block text-sm font-semibold mb-1">Nome</label>
+          {selectedProfessional && (
+            <div className="w-5/6 bg-gray-100 rounded-lg shadow-md p-6 profissional-container">
+              <h2 className="text-xl font-bold mb-4">
+                Informações do Profissional
+              </h2>
+              <form>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-semibold mb-1">
+                      Nome
+                    </label>
                     <input
                       type="text"
-                      name="name"
-                      value={newProfessional.name}
-                      onChange={handleInputChange}
+                      name="nome_funcionario"
+                      value={selectedProfessional.nome_funcionario}
+                      onChange={handleSelectedProfessionalChange}
                       className="w-full p-3 border border-gray-300 rounded-lg"
+                      disabled={!isEditing}
                     />
                   </div>
-                  <div className="mb-4">
-                    <label className="block text-sm font-semibold mb-1">CPF</label>
+                  <div>
+                    <label className="block text-sm font-semibold mb-1">
+                      CPF
+                    </label>
                     <input
                       type="text"
                       name="cpf"
-                      value={newProfessional.cpf}
-                      onChange={handleInputChange}
+                      value={selectedProfessional.cpf}
+                      onChange={handleSelectedProfessionalChange}
                       className="w-full p-3 border border-gray-300 rounded-lg"
+                      disabled={!isEditing}
                     />
                   </div>
-                  <div className="mb-4">
-                    <label className="block text-sm font-semibold mb-1">Email</label>
+                  <div>
+                    <label className="block text-sm font-semibold mb-1">
+                      Especialidade
+                    </label>
+                    <input
+                      type="text"
+                      value={
+                        specialties.find(
+                          (s) =>
+                            s.id_especialidade ===
+                            selectedProfessional.id_especialidade
+                        )?.nome_especialidade || ""
+                      }
+                      disabled
+                      className="w-full p-3 border border-gray-300 rounded-lg bg-gray-100"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-semibold mb-1">
+                      Email
+                    </label>
                     <input
                       type="email"
                       name="email"
-                      value={newProfessional.email}
-                      onChange={handleInputChange}
+                      value={selectedProfessional.email}
+                      onChange={handleSelectedProfessionalChange}
                       className="w-full p-3 border border-gray-300 rounded-lg"
+                      disabled={!isEditing}
                     />
                   </div>
-                  <div className="mb-4">
-                    <label className="block text-sm font-semibold mb-1">Telefone</label>
+                  <div>
+                    <label className="block text-sm font-semibold mb-1">
+                      Telefone
+                    </label>
                     <input
                       type="tel"
-                      name="phone"
-                      value={newProfessional.phone}
-                      onChange={handleInputChange}
+                      name="telefone"
+                      value={selectedProfessional.telefone}
+                      onChange={handleSelectedProfessionalChange}
                       className="w-full p-3 border border-gray-300 rounded-lg"
+                      disabled={!isEditing}
                     />
                   </div>
-                  <div className="mb-6">
-                    <label className="block text-sm font-semibold mb-1">Especialidade</label>
-                    <select
-                      name="specialty"
-                      value={newProfessional.specialty}
-                      onChange={handleInputChange}
-                      className="w-full p-3 border border-gray-300 rounded-lg"
-                    >
-                      <option value="">Selecione uma especialidade</option>
-                      {specialties.map((specialty) => (
-                        <option key={specialty.id} value={specialty.id}>
-                          {specialty.name}
-                        </option>
-                      ))}
-                    </select>
+                </div>
+
+                <h3 className="text-xl font-bold mt-6 mb-4">
+                  Horários de Expediente
+                </h3>
+                {daysOfWeek.map((day) => (
+                  <div key={day} className="mb-4">
+                    <h4 className="text-lg font-bold mb-2">{day}</h4>
+                    {(workHours[day.toLowerCase()] || []).map(
+                      (timeSlot, index) => {
+                        const [start, end] = timeSlot.split("-");
+                        return (
+                          <div
+                            key={index}
+                            className="flex gap-4 mb-2 items-center"
+                          >
+                            <input
+                              type="time"
+                              value={start}
+                              onChange={(e) =>
+                                handleTimeChange(
+                                  day.toLowerCase(),
+                                  index,
+                                  "start",
+                                  e.target.value
+                                )
+                              }
+                              disabled={!isEditing}
+                              className="w-1/4 p-2 border border-gray-300 rounded-lg"
+                            />
+                            <span>-</span>
+                            <input
+                              type="time"
+                              value={end}
+                              onChange={(e) =>
+                                handleTimeChange(
+                                  day.toLowerCase(),
+                                  index,
+                                  "end",
+                                  e.target.value
+                                )
+                              }
+                              disabled={!isEditing}
+                              className="w-1/4 p-2 border border-gray-300 rounded-lg"
+                            />
+                            {isEditing && (
+                              <button
+                                type="button"
+                                onClick={() =>
+                                  removeTimeSlot(day.toLowerCase(), index)
+                                }
+                                className="text-red-500 font-bold"
+                              >
+                                Remover
+                              </button>
+                            )}
+                          </div>
+                        );
+                      }
+                    )}
+                    {isEditing && (
+                      <button
+                        type="button"
+                        onClick={() => addTimeSlot(day.toLowerCase())}
+                        className="text-blue-500 font-bold mt-2"
+                      >
+                        Adicionar intervalo
+                      </button>
+                    )}
                   </div>
-                  
-                  <div className="flex justify-end gap-2 mt-6">
-                    <button
-                      type="button"
-                      className="bg-gray-200 text-black px-4 py-2 rounded-md shadow hover:bg-gray-300"
-                      onClick={() => setIsModalOpen(false)}
-                    >
-                      Cancelar
-                    </button>
+                ))}
+
+                <div className="flex justify-end gap-4 mt-6">
+                  <button
+                    type="button"
+                    className="bg-gray-200 text-black px-4 py-2 rounded-md shadow hover:bg-gray-300"
+                    onClick={() => setIsEditing((prev) => !prev)}
+                  >
+                    {isEditing ? "Cancelar" : "Editar"}
+                  </button>
+                  {isEditing && (
                     <button
                       type="button"
                       className="bg-yellow-400 text-black px-4 py-2 rounded-md shadow hover:bg-yellow-500"
-                      onClick={handleModalSubmit}
+                      onClick={handleEditProfessional}
                     >
                       Salvar
                     </button>
-                  </div>
-                </form>
-              </div>
+                  )}
+                </div>
+              </form>
             </div>
           )}
+        </div>
 
+        {isModalOpen && (
+          <div className="fixed inset-0 bg-gray-800 bg-opacity-50 flex justify-center items-center z-50">
+            <div className="bg-white rounded-lg shadow-lg p-6 w-1/3">
+              <div className="header">
+                <h2>Adicionar novo profissional</h2>
+              </div>
+              <form onSubmit={(e) => e.preventDefault()}>
+                <div className="mb-4">
+                  <label className="block text-sm font-semibold mb-1">
+                    Nome
+                  </label>
+                  <input
+                    type="text"
+                    name="nome_funcionario"
+                    value={newProfessional.nome_funcionario}
+                    onChange={handleInputChange}
+                    className="w-full p-3 border border-gray-300 rounded-lg"
+                  />
+                </div>
+                <div className="mb-4">
+                  <label className="block text-sm font-semibold mb-1">
+                    CPF
+                  </label>
+                  <input
+                    type="text"
+                    name="cpf"
+                    value={newProfessional.cpf}
+                    onChange={handleInputChange}
+                    className="w-full p-3 border border-gray-300 rounded-lg"
+                  />
+                </div>
+                <div className="mb-4">
+                  <label className="block text-sm font-semibold mb-1">
+                    Email
+                  </label>
+                  <input
+                    type="email"
+                    name="email"
+                    value={newProfessional.email}
+                    onChange={handleInputChange}
+                    className="w-full p-3 border border-gray-300 rounded-lg"
+                  />
+                </div>
+                <div className="mb-4">
+                  <label className="block text-sm font-semibold mb-1">
+                    Telefone
+                  </label>
+                  <input
+                    type="tel"
+                    name="telefone"
+                    value={newProfessional.telefone}
+                    onChange={handleInputChange}
+                    className="w-full p-3 border border-gray-300 rounded-lg"
+                  />
+                </div>
+                <div className="mb-6">
+                  <label className="block text-sm font-semibold mb-1">
+                    Especialidade
+                  </label>
+                  <select
+                    name="id_especialidade"
+                    value={newProfessional.id_especialidade}
+                    onChange={handleInputChange}
+                    className="w-full p-3 border border-gray-300 rounded-lg"
+                  >
+                    <option value="">Selecione uma especialidade</option>
+                    {specialties.map((specialty) => (
+                      <option
+                        key={specialty.id_especialidade}
+                        value={specialty.id_especialidade}
+                      >
+                        {specialty.nome_especialidade}
+                      </option>
+                    ))}
+                  </select>
+                </div>
 
-      {isSpecialtyModalOpen && (
+                <div className="flex justify-end gap-2 mt-6">
+                  <button
+                    type="button"
+                    className="bg-gray-200 text-black px-4 py-2 rounded-md shadow hover:bg-gray-300"
+                    onClick={() => setIsModalOpen(false)}
+                  >
+                    Cancelar
+                  </button>
+                  <button
+                    type="button"
+                    className="bg-yellow-400 text-black px-4 py-2 rounded-md shadow hover:bg-yellow-500"
+                    onClick={handleAddProfessional}
+                  >
+                    Salvar
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
+
+        {isSpecialtyModalOpen && (
           <div className="fixed inset-0 bg-gray-800 bg-opacity-50 flex justify-center items-center z-50">
             <div className="bg-white rounded-lg shadow-lg p-6 w-1/3">
               <div className="header">
                 <h2>Adicionar nova especialidade</h2>
-              </div>              
+              </div>
               <form onSubmit={(e) => e.preventDefault()}>
                 <div className="mb-4">
-                  <label className="block text-sm font-semibold mb-1">Nome</label>
+                  <label className="block text-sm font-semibold mb-1">
+                    Nome
+                  </label>
                   <input
                     type="text"
-                    name="name"
-                    value={newSpecialty.name}
+                    name="nome_especialidade"
+                    value={newSpecialty.nome_especialidade}
                     onChange={handleSpecialtyInputChange}
                     className="w-full p-3 border border-gray-300 rounded-lg"
                   />
@@ -402,7 +544,7 @@ const ProfessionalsPage = () => {
                   <button
                     type="button"
                     className="bg-yellow-400 text-black px-4 py-2 rounded-md shadow hover:bg-yellow-500"
-                    onClick={handleSpecialtyModalSubmit}
+                    onClick={handleAddSpecialty}
                   >
                     Salvar
                   </button>
@@ -411,8 +553,7 @@ const ProfessionalsPage = () => {
             </div>
           </div>
         )}
-
-    </div>
+      </div>
     </Layout>
   );
 };

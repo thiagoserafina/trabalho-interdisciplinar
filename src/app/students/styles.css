@@ -32,11 +32,26 @@
   font-size: 14px;
   margin-left: auto;
 }
+
+.table-wrapper {
+  max-height: 75vh;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+}
+
 .students-table {
   width: 100%;
   background-color: #efefef;
   border-collapse: collapse;
-  border-radius: 10px;
+}
+
+.students-table thead tr {
+  background-color: #efefef;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  color: #333;
 }
 
 .students-table th,
