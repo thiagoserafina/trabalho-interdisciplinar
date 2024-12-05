@@ -59,3 +59,7 @@ export async function changePassword(data) {
     throw new Error("Erro ao alterar senha.");
   }
 }
+
+export async function addProfessional(data) {
+  const response = await axiosInstance.post("/api/", data)
+}
