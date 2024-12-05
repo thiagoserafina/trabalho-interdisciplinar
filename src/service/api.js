@@ -59,3 +59,53 @@ export async function changePassword(data) {
     throw new Error("Erro ao alterar senha.");
   }
 }
+
+export async function getEvents() {
+  const cookiesData = await cookies();
+  const token = cookiesData.get(TOKEN_KEY).value;
+
+  if (!token) {
+    throw new Error("Token não encontrado.");
+  }
+
+  const response = await axiosInstance.get("/api/agendamentos", {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  return response.data.map((agendamento) => ({
+    id_agendamento: agendamento.id_agendamento,
+    nome_aluno: agendamento.nome_aluno,
+    nome_funcionario: agendamento.nome_funcionario,
+    nome_especialidade: agendamento.nome_especialidade,
+    data_agendamento: agendamento.data_agendamento,
+    hora_inicio: agendamento.hora_inicio,
+    hora_fim: agendamento.hora_fim,
+    tipo_atendimento: agendamento.tipo_atendimento,
+    sala: agendamento.sala,
+    cancelado: agendamento.cancelado,
+    color: agendamento.cancelado ? "red" : "green",
+    status: agendamento.cancelado ? "Cancelado" : "Agendado",
+  }));
+}
+
+export async function deleteEvent(id) {
+  if (!id) {
+    throw new Error("ID do agendamento não fornecido");
+  }
+
+  const cookiesData = await cookies();
+  const token = cookiesData.get(TOKEN_KEY).value;
+
+  if (!token) {
+    throw new Error("Token não encontrado.");
+  }
+
+  const response = await axiosInstance.delete(`/api/agendamentos/${id}`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  return response.status;
+}
